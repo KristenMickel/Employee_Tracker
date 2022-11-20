@@ -44,8 +44,24 @@ function runDbQuery() {
       db.query('SELECT * FROM department;', function (err, results) {
         console.table(results);
       });
-    } else {
+    } else if (selection === 'view all roles') {
+        db.query('SELECT * FROM role;', function (err, results) {
+          console.table(results);
+        });
+    } else if (selection === 'view all employees') {
+        db.query('SELECT * FROM employee;', function (err, results) {
+          console.table(results);
+        });
+    } else if (selection === 'add a department') {
       //Add other selection options
+    } else if (selection === 'add a role') {
+      //Add other selection options
+    } else if (selection === 'add as employee') {
+      //Add other selection options
+    } else if (selection === 'add an employee role'){
+      //Add other selection options
+    } else {
+      //"No selection was made"
     }
   })
   .catch((error) => {
