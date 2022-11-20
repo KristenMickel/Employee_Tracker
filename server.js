@@ -25,9 +25,9 @@ const db = mysql.createConnection(
 const initialQuestion = [
   {
     type: 'list',
-    name: 'options',
+    name: 'choices',
     message: 'Please pick an option',
-    options: ['view all departments', 'view all roles', 'view all employees', 'add a department', 'add a role', 'add an employee', 'update an employee role'],
+    choices: ['view all departments', 'view all roles', 'view all employees', 'add a department', 'add a role', 'add an employee', 'update an employee role'],
     //Need a filter function so that when the user selects an option, it will filter for that choice and return the value.
     filter(val) {
       return val.toLowerCase();
