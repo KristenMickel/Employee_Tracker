@@ -67,7 +67,7 @@ function questionPrompt() {
   });
 }
 
-//This query grabs everything from the department table
+//This query grabs everything from the department table.
 function viewAllDepartments() {
   db.query('SELECT * FROM department;', function (err, results) {
     console.table(results);
@@ -75,17 +75,17 @@ function viewAllDepartments() {
   });
 };
 
-//this query grabs everything from the role table
+//This query grabs select data from the role and department tables.
 function viewAllRoles() {
-  db.query('SELECT * FROM role;', function (err, results) {
+  db.query('SELECT r.id AS role_id, r.title, r.salary, d.name AS department_name FROM role AS r INNER JOIN department AS d ON r.department_id = d.id;', function (err, results) {
     console.table(results);
     questionPrompt();
   });
 };
 
-//This query grabs everything from the employees table
+//This query grabs select data from the department, role, and employee tables.
 function viewAllEmployees() {
-  db.query('SELECT * FROM employee;', function (err, results) {
+  db.query('SELECT e.id as employee_id, e.first_name, e.last_name, r.title, r.salary, d.name AS department_name, m.last_name AS manager FROM employee AS e INNER JOIN role as r ON e.role_id = r.id INNER JOIN department as d ON r.department_id = d.id LEFT JOIN employee AS m ON e.manager_id = m.id;', function (err, results) {
     console.table(results);
     questionPrompt();
   });
