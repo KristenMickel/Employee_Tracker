@@ -92,6 +92,22 @@ function viewAllEmployees() {
 };
 
 //Add a department
+function addDepartment() {
+  inquirer.prompt([
+    {
+    type: "input",
+    message: "Enter the name of the department you would like to add",
+    name: "dept",
+    },
+  ])
+  .then(results => {
+    const { dept } = results;
+    db.query("INSERT INTO department SET ?", {name: dept}, function (err, results) {
+      console.table(results);
+    viewAllDepartments();
+    });
+  });
+};
 
 //Add a role
 
