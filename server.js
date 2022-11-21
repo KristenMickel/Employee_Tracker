@@ -1,9 +1,11 @@
-//Previously, we were saving data in JSON files, but now we will be saving data in the database.
+//Need to import 'inquirer' in order to be able to receive input from the terminal.
 const inquirer = require('inquirer');
+//Need to import 'mysql2' in order to be able to use the Oracle SQL database.
 const mysql = require('mysql2');
+//Use the console.table() method in order to be able to display database results as a table.
 require('console.table');
 
-//Here, I am creating the connection to my database.
+//This creates the connection to my database.
 const db = mysql.createConnection(
   {
     //I am going to run this on my local machine.
@@ -17,17 +19,20 @@ const db = mysql.createConnection(
   }
 );
 
+//I am connecting to my database. 
 db.connect((err) => {
+  //This is my error handling.
   if (err) throw err;
   //This message lets me know that it connected successfully.
   console.log('Connected to the employeeTracker database');
+  //This will start the questionPrompt function.
   questionPrompt();
 });
 
 
 //This is the list of options that the prompt will display to the user. 
 function questionPrompt() {
-  //Initial questions
+  //These are the initial questions posed to the user at each prompt call.
   inquirer.prompt([
     {
       type: 'list',
@@ -36,7 +41,7 @@ function questionPrompt() {
       choices: ['view all departments', 'view all roles', 'view all employees', 'add a department', 'add a role', 'add an employee', 'update an employee role'],
     },
   ])
-  //Switch statement used to select a different function to execute based on the user's choice selection.
+  //This switch statement is used to select a different function to execute based on the user's choice selection.
   .then((selection) => {
     console.log(selection.choices);
     switch (selection.choices) {
@@ -67,7 +72,7 @@ function questionPrompt() {
   });
 }
 
-//This query grabs everything from the department table.
+//This query grabs and displays everything from the department table.
 function viewAllDepartments() {
   db.query('SELECT * FROM department;', function (err, results) {
     console.table(results);
@@ -75,7 +80,7 @@ function viewAllDepartments() {
   });
 };
 
-//This query grabs select data from the role and department tables.
+//This query grabs and displays select data from the role and department tables.
 function viewAllRoles() {
   db.query('SELECT r.id AS role_id, r.title, r.salary, d.name AS department_name FROM role AS r INNER JOIN department AS d ON r.department_id = d.id;', function (err, results) {
     console.table(results);
@@ -83,15 +88,15 @@ function viewAllRoles() {
   });
 };
 
-//This query grabs select data from the department, role, and employee tables.
+//This query grabs and displays select data from the department, role, and employee tables.
 function viewAllEmployees() {
-  db.query('SELECT e.id as employee_id, e.first_name, e.last_name, r.title, r.salary, d.name AS department_name, m.last_name AS manager FROM employee AS e INNER JOIN role as r ON e.role_id = r.id INNER JOIN department as d ON r.department_id = d.id LEFT JOIN employee AS m ON e.manager_id = m.id;', function (err, results) {
+  db.query('SELECT e.id AS employee_id, e.first_name, e.last_name, r.title, r.salary, d.name AS department_name, m.last_name AS manager FROM employee AS e INNER JOIN role as r ON e.role_id = r.id INNER JOIN department as d ON r.department_id = d.id LEFT JOIN employee AS m ON e.manager_id = m.id;', function (err, results) {
     console.table(results);
     questionPrompt();
   });
 };
 
-//Add a department
+//This INSERT statement prompts the user to enter the name of the new department they want to add, adds the new department to the department table, and displays the data in a table format.
 function addDepartment() {
   inquirer.prompt([
     {
@@ -109,7 +114,7 @@ function addDepartment() {
   });
 };
 
-//Add a role
+//This INSERT statement prompts the user to enter the title, salary, and department id of the new role they want to add, adds the new role to the role table, and displays the data in a table format.
 function addRole() {
   inquirer.prompt([
     {
@@ -137,7 +142,7 @@ function addRole() {
   });
 };
 
-//Add an employee
+//This INSERT statement prompts the user to enter the first name, last name, role id, and manager id of the new employee they want to add, adds the new employee to the employee table, and displays the data in a table format.
 function addEmployee() {
   inquirer.prompt([
     {
@@ -161,7 +166,7 @@ function addEmployee() {
       name: "manager_id",
     },
   ])
-  //This is not ideal requiring the user to input the id of the role and manager.
+  //This is not ideal requiring the user to input the ids of the role and manager.
   .then(results => {
     db.query("INSERT INTO employee SET ?", {first_name:results.newFirstName, last_name:results.newLastName, role_id:results.role_id, manager_id:results.manager_id}, function (err, results) {
       console.table(results);
@@ -170,7 +175,7 @@ function addEmployee() {
   });
 };
 
-//Update an employee role
+//This UPDATE statement updates selected fields in the employee table. But, it is not working correctly. It should update the role_id field in the employee table where an employee's last name is the last_name entered by the user. 
 function updateEmployeeRole() {
   inquirer.prompt([
     {
@@ -185,7 +190,6 @@ function updateEmployeeRole() {
     },
   ])
   //This is not ideal requiring the user to input the id of the role.
-  //This is not working correctly. Essentially, I am trying to update the role_id field in the employee table where an employee's last name is the last_name entered by the user. But, I cannot get the role_id to upate.
   .then(results => {
     db.query("UPDATE employee SET ? WHERE ?", {role_id:results.role_id, last_name:results.last_name}, function (err, results) {
       console.table(results);
