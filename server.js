@@ -38,7 +38,7 @@ function questionPrompt() {
       type: 'list',
       name: 'choices',
       message: 'Please pick an option',
-      choices: ['view all departments', 'view all roles', 'view all employees', 'add a department', 'add a role', 'add an employee', 'update an employee role', 'view employees by manager', 'view employees by department', 'delete a department', 'delete a role', 'delete an employee'],
+      choices: ['view all departments', 'view all roles', 'view all employees', 'add a department', 'add a role', 'add an employee', 'update an employee role', 'view employees by manager', 'view employees by department', 'delete a department', 'delete a role', 'delete an employee', 'sum salaries by department'],
     },
   ])
   //This switch statement is used to select a different function to execute based on the user's choice selection.
@@ -80,6 +80,9 @@ function questionPrompt() {
         break;
       case 'delete an employee':
         deleteEmployee();
+        break;
+      case 'sum salaries by department':
+        sumSalariesByDepartment();
         break;
       default:
         db.end();
@@ -256,7 +259,6 @@ function deleteRole() {
     name: "deleteRole",
     },
   ])
-  //This is not ideal requiring the user to input the id of the department.
   .then(results => {
     db.query("DELETE FROM role WHERE ?", {title:results.deleteRole}, function (err, results) {
       console.table(results);
@@ -274,7 +276,6 @@ function deleteEmployee() {
     name: "deleteLastName",
     },
   ])
-  //This is not ideal requiring the user to input the ids of the role and manager.
   .then(results => {
     db.query("DELETE FROM employee WHERE ?", {last_name:results.deleteLastName}, function (err, results) {
       console.table(results);
@@ -283,10 +284,10 @@ function deleteEmployee() {
   });
 };
 
-//This query grabs salaries by department and sums them together to get a department total.
-// function viewAllEmployees() {
-//   db.query('SELECT e.id AS employee_id, e.first_name, e.last_name, r.title, r.salary, d.name AS department_name, m.last_name AS manager FROM employee AS e INNER JOIN role as r ON e.role_id = r.id INNER JOIN department as d ON r.department_id = d.id LEFT JOIN employee AS m ON e.manager_id = m.id;', function (err, results) {
-//     console.table(results);
-//     questionPrompt();
-//   });
-// };
+//This query uses the SUM aggregate function to grab salaries by department and sums them together to get a department total.
+function sumSalariesByDepartment() {
+  db.query('SELECT d.name AS department_name, SUM(r.salary) AS total_dept_salaries FROM employee AS e INNER JOIN role as r ON e.role_id = r.id INNER JOIN department as d ON r.department_id = d.id LEFT JOIN employee AS m ON e.manager_id = m.id GROUP BY d.name;', function (err, results) {
+    console.table(results);
+    questionPrompt();
+  });
+};
