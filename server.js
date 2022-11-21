@@ -110,6 +110,32 @@ function addDepartment() {
 };
 
 //Add a role
+function addRole() {
+  inquirer.prompt([
+    {
+    type: "input",
+    message: "Enter the title of the role you would like to add",
+    name: "newTitle",
+    },
+    {
+      type: "input",
+      message: "Enter the salary of the role you would like to add",
+      name: "newSalary",
+    },
+    {
+      type: "input",
+      message: "Enter the department of the role you would like to add",
+      name: "department_id",
+    },
+  ])
+  //This is not ideal requiring the user to input the id of the department.
+  .then(results => {
+    db.query("INSERT INTO role SET ?", {title:results.newTitle, salary:results.newSalary, department_id:results.department_id}, function (err, results) {
+      console.table(results);
+    viewAllRoles();
+    });
+  });
+};
 
 //Add an employee
 
