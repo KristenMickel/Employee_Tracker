@@ -38,7 +38,7 @@ function questionPrompt() {
       type: 'list',
       name: 'choices',
       message: 'Please pick an option',
-      choices: ['view all departments', 'view all roles', 'view all employees', 'add a department', 'add a role', 'add an employee', 'update an employee role'],
+      choices: ['view all departments', 'view all roles', 'view all employees', 'add a department', 'add a role', 'add an employee', 'update an employee role', 'view employees by manager', 'view employees by department'],
     },
   ])
   //This switch statement is used to select a different function to execute based on the user's choice selection.
@@ -65,6 +65,12 @@ function questionPrompt() {
         break;
       case 'update an employee role':
         updateEmployeeRole();
+        break;
+      case 'view employees by manager':
+        viewEmployeesByManager();
+        break;
+      case 'view employees by department':
+        viewEmployeesByDepartment();
         break;
       default:
         db.end();
@@ -197,3 +203,27 @@ function updateEmployeeRole() {
     });
   });
 };
+
+//This query is supposed to grab and display employees grouped by the manager they report to. However, GROUP BY is only returning the name of the first employee listed for a manager in the employee table.
+function viewEmployeesByManager() {
+  db.query('SELECT e.id AS employee_id, e.first_name, e.last_name, r.title, m.last_name AS manager FROM employee AS e INNER JOIN role as r ON e.role_id = r.id INNER JOIN department as d ON r.department_id = d.id LEFT JOIN employee AS m ON e.manager_id = m.id GROUP BY m.last_name;', function (err, results) {
+    console.table(results);
+    questionPrompt();
+  });
+};
+
+//This query is supposed to grab and display employees grouped by the department they belong to. However, GROUP BY is only returning the name of the first employee listed for a department in the employee table.
+function viewEmployeesByDepartment() {
+  db.query('SELECT e.id AS employee_id, e.first_name, e.last_name, d.name AS department_name FROM employee AS e INNER JOIN role as r ON e.role_id = r.id INNER JOIN department as d ON r.department_id = d.id LEFT JOIN employee AS m ON e.manager_id = m.id GROUP BY d.name;', function (err, results) {
+    console.table(results);
+    questionPrompt();
+  });
+};
+
+//This query grabs salaries by department and sums them together to get a department total.
+// function viewAllEmployees() {
+//   db.query('SELECT e.id AS employee_id, e.first_name, e.last_name, r.title, r.salary, d.name AS department_name, m.last_name AS manager FROM employee AS e INNER JOIN role as r ON e.role_id = r.id INNER JOIN department as d ON r.department_id = d.id LEFT JOIN employee AS m ON e.manager_id = m.id;', function (err, results) {
+//     console.table(results);
+//     questionPrompt();
+//   });
+// };
