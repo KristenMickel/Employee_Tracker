@@ -38,7 +38,7 @@ function questionPrompt() {
       type: 'list',
       name: 'choices',
       message: 'Please pick an option',
-      choices: ['view all departments', 'view all roles', 'view all employees', 'add a department', 'add a role', 'add an employee', 'update an employee role', 'view employees by manager', 'view employees by department'],
+      choices: ['view all departments', 'view all roles', 'view all employees', 'add a department', 'add a role', 'add an employee', 'update an employee role', 'view employees by manager', 'view employees by department', 'delete a department', 'delete a role', 'delete an employee'],
     },
   ])
   //This switch statement is used to select a different function to execute based on the user's choice selection.
@@ -71,6 +71,15 @@ function questionPrompt() {
         break;
       case 'view employees by department':
         viewEmployeesByDepartment();
+        break;
+      case 'delete a department':
+        deleteDepartment();
+        break;
+      case 'delete a role':
+        deleteRole();
+        break;
+      case 'delete an employee':
+        deleteEmployee();
         break;
       default:
         db.end();
@@ -217,6 +226,60 @@ function viewEmployeesByDepartment() {
   db.query('SELECT e.id AS employee_id, e.first_name, e.last_name, d.name AS department_name FROM employee AS e INNER JOIN role as r ON e.role_id = r.id INNER JOIN department as d ON r.department_id = d.id LEFT JOIN employee AS m ON e.manager_id = m.id GROUP BY d.name;', function (err, results) {
     console.table(results);
     questionPrompt();
+  });
+};
+
+//This DELETE statement prompts the user to enter the name of the department they want to delete and removes it from the department table.
+function deleteDepartment() {
+  inquirer.prompt([
+    {
+    type: "input",
+    message: "Enter the name of the department you would like to delete",
+    name: "deleteDepartment",
+    },
+  ])
+  .then(results => {
+    const { dept } = results;
+    db.query("DELETE FROM department WHERE ?", {name:results.deleteDepartment}, function (err, results) {
+      console.table(results);
+    viewAllDepartments();
+    });
+  });
+};
+
+//This DELETE statement prompts the user to enter the name of the role they want to delete and removes it from the role table.
+function deleteRole() {
+  inquirer.prompt([
+    {
+    type: "input",
+    message: "Enter the title of the role you would like to delete",
+    name: "deleteRole",
+    },
+  ])
+  //This is not ideal requiring the user to input the id of the department.
+  .then(results => {
+    db.query("DELETE FROM role WHERE ?", {title:results.deleteRole}, function (err, results) {
+      console.table(results);
+    viewAllRoles();
+    });
+  });
+};
+
+//This DELETE statement prompts the user to enter the name of the employee they want to delete and removes it from the employee table.
+function deleteEmployee() {
+  inquirer.prompt([
+    {
+    type: "input",
+    message: "Enter the last name of the employee you would like to delete",
+    name: "deleteLastName",
+    },
+  ])
+  //This is not ideal requiring the user to input the ids of the role and manager.
+  .then(results => {
+    db.query("DELETE FROM employee WHERE ?", {last_name:results.deleteLastName}, function (err, results) {
+      console.table(results);
+    viewAllEmployees();
+    });
   });
 };
 
