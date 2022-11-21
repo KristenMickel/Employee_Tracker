@@ -171,3 +171,25 @@ function addEmployee() {
 };
 
 //Update an employee role
+function updateEmployeeRole() {
+  inquirer.prompt([
+    {
+    type: "input",
+    message: "Enter the last name of the employee you would like to update",
+    name: "last_name",
+    },
+    {
+      type: "input",
+      message: "Enter the new role id of the employee you would like to update",
+      name: "role_id",
+    },
+  ])
+  //This is not ideal requiring the user to input the id of the role.
+  //This is not working correctly. Essentially, I am trying to update the role_id field in the employee table where an employee's last name is the last_name entered by the user. But, I cannot get the role_id to upate.
+  .then(results => {
+    db.query("UPDATE employee SET ? WHERE ?", {role_id:results.role_id, last_name:results.last_name}, function (err, results) {
+      console.table(results);
+    viewAllEmployees();
+    });
+  });
+};
