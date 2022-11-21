@@ -124,7 +124,7 @@ function addRole() {
     },
     {
       type: "input",
-      message: "Enter the department of the role you would like to add",
+      message: "Enter the department id of the role you would like to add",
       name: "department_id",
     },
   ])
@@ -138,5 +138,36 @@ function addRole() {
 };
 
 //Add an employee
+function addEmployee() {
+  inquirer.prompt([
+    {
+    type: "input",
+    message: "Enter the first name of the employee you would like to add",
+    name: "newFirstName",
+    },
+    {
+      type: "input",
+      message: "Enter the last name of the employee you would like to add",
+      name: "newLastName",
+    },
+    {
+      type: "input",
+      message: "Enter the role id of the employee you would like to add",
+      name: "role_id",
+    },
+    {
+      type: "input",
+      message: "Enter the employee id of the manager that you would like the employee to have",
+      name: "manager_id",
+    },
+  ])
+  //This is not ideal requiring the user to input the id of the role and manager.
+  .then(results => {
+    db.query("INSERT INTO employee SET ?", {first_name:results.newFirstName, last_name:results.newLastName, role_id:results.role_id, manager_id:results.manager_id}, function (err, results) {
+      console.table(results);
+    viewAllEmployees();
+    });
+  });
+};
 
 //Update an employee role
